@@ -11,8 +11,8 @@
 <body class="dashboard-page">
 
     <header class="header-main bg-dark flex j-between a-center padding-sm">
-        <div class="logo-placeholder"></div> <img src="./img/Logo.jpg" alt="Logo Traxión" class="logo-img-md">
-        
+        <div class="logo-placeholder"></div> 
+        <img src="./img/Logo.jpg" alt="Logo Traxión" class="logo-img-md">
         <a href="login.html" class="btn-return">← Regresar</a>
     </header>
 
@@ -43,22 +43,84 @@
                 <div class="pulse"></div>
             </div>
         </section>
-
     </main>
+
+    <div id="alert-overlay" class="alert-overlay hidden">
+        <div id="danger-circle" class="alert-circle danger hidden">
+            <div class="alert-content">
+                <span class="icon">⚠️</span>
+                <h3>BLOQUEO DETECTADO</h3>
+                <p id="danger-text">Cierre total en Km 80 México-Querétaro.</p>
+                <button onclick="closeAlert('danger-circle')">Entendido</button>
+            </div>
+        </div>
+
+        <div id="info-circle" class="alert-circle info hidden">
+            <div class="alert-content">
+                <span class="icon">🧠</span>
+                <h3>RUTA SUGERIDA</h3>
+                <p id="info-text">Desvío por San Juan del Río. Ahorro de 2 horas.</p>
+                <button onclick="closeAlert('info-circle')">Aceptar Ruta</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Inicializar Mapa
+        // 1. Inicializar Mapa
         var map = L.map('map').setView([19.95, -99.5], 8);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Marcador simulado del camión
         var truckIcon = L.divIcon({
             className: 'truck-marker',
             html: "<div style='background-color:#E06A26; width:15px; height:15px; border-radius:50%; border:2px solid white;'></div>",
             iconSize: [15, 15]
         });
         L.marker([19.6, -99.2], {icon: truckIcon}).addTo(map).bindPopup("Unidad TR-502").openPopup();
+
+        // 2. Lógica de Simulación y Voz
+        let simulationStarted = false;
+
+        function iaSpeak(text) {
+            window.speechSynthesis.cancel(); 
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'es-MX';
+            utterance.rate = 0.9;
+            setTimeout(() => { window.speechSynthesis.speak(utterance); }, 100);
+        }
+
+        function closeAlert(id) {
+            document.getElementById(id).classList.add('hidden');
+            const dangerHidden = document.getElementById('danger-circle').classList.contains('hidden');
+            const infoHidden = document.getElementById('info-circle').classList.contains('hidden');
+            
+            if (dangerHidden && infoHidden) {
+                document.getElementById('alert-overlay').classList.add('hidden');
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        function startAlertSimulation() {
+            if (simulationStarted) return;
+            simulationStarted = true;
+
+            setTimeout(() => {
+                document.getElementById('alert-overlay').classList.remove('hidden');
+                document.getElementById('danger-circle').classList.remove('hidden');
+                document.getElementById('info-circle').classList.remove('hidden');
+
+                const alertaTexto = "Alerta crítica de Resilient Pilot. Bloqueo total detectado en kilómetro 80. Sugerencia: tomar desvío por San Juan del Río para evitar retraso de dos horas.";
+                iaSpeak(alertaTexto);
+
+                const log = document.getElementById('ai-messages');
+                log.innerHTML += `<p class="msg-ia" style="color:red; font-weight:bold; margin-top:10px;">⚠️ BLOQUEO KM 80</p>`;
+                log.innerHTML += `<p class="msg-ia" style="color:blue; font-weight:bold;">🧠 DESVÍO SUGERIDO</p>`;
+                log.scrollTop = log.scrollHeight;
+            }, 3000);
+        }
+
+        document.addEventListener('click', startAlertSimulation, { once: true });
+        document.addEventListener('keydown', startAlertSimulation, { once: true });
     </script>
 </body>
 </html>
