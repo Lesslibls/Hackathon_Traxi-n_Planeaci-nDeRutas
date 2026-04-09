@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Traxión - Resilient Pilot</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="./style/app.css">
+</head>
+<body class="dashboard-page">
+
+    <header class="header-main bg-dark flex j-between a-center padding-sm">
+        <div class="logo-placeholder"></div> <img src="./img/Logo.jpg" alt="Logo Traxión" class="logo-img-md">
+        
+        <a href="login.html" class="btn-return">← Regresar</a>
+    </header>
+
+    <main class="main-dashboard flex wrap">
+        
+        <aside class="sidebar flex flex-column padding-md">
+            <div class="card status-card margin-b-md">
+                <h3>Estado de la Unidad</h3>
+                <p><strong>Unidad:</strong> TR-502</p>
+                <p><strong>Carga:</strong> 92% (Óptima)</p>
+                <p><strong>Siguiente Parada:</strong> San Juan del Río</p>
+            </div>
+
+            <div class="card ai-log-card">
+                <h3>Actividad del Agente</h3>
+                <div id="ai-messages" class="scroll-area">
+                    <p class="msg-ia">🤖 Escaneando ruta México-Querétaro...</p>
+                    <p class="msg-ia">✅ Sin bloqueos reportados por GN.</p>
+                </div>
+            </div>
+        </aside>
+
+        <section class="map-section flex-grow">
+            <div id="map"></div>
+            
+            <div class="ai-agent-float">
+                <img src="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" alt="IA">
+                <div class="pulse"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inicializar Mapa
+        var map = L.map('map').setView([19.95, -99.5], 8);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // Marcador simulado del camión
+        var truckIcon = L.divIcon({
+            className: 'truck-marker',
+            html: "<div style='background-color:#E06A26; width:15px; height:15px; border-radius:50%; border:2px solid white;'></div>",
+            iconSize: [15, 15]
+        });
+        L.marker([19.6, -99.2], {icon: truckIcon}).addTo(map).bindPopup("Unidad TR-502").openPopup();
+    </script>
+</body>
+</html>
